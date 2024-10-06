@@ -14,7 +14,7 @@ const (
 	leagueID = "79286"
 	// username = "USERNAME"
 	// password = "PASSWORD"
-	year    = "2022"
+	year    = "2024"
 	proto   = "https"
 	apiHost = "api.myfantasyleague.com"
 	json    = 0
@@ -23,6 +23,12 @@ const (
 
 func main() {
 	client := &http.Client{}
+
+	username, password, err := LoadCredentials()
+	if err != nil {
+		fmt.Printf("Error loading credentials: %v\n", err)
+		return
+	}
 
 	loginURL := fmt.Sprintf("https://%s/%s/login?USERNAME=%s&PASSWORD=%s&XML=1", apiHost, year, username, password)
 	fmt.Printf("Making request to get cookie: %s\n", loginURL)
