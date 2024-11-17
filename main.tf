@@ -10,7 +10,7 @@ module "ffnotifier_lambda_function" {
 
   function_name          = "fantasy-football-notifier"
   description            = "My awesome lambda function"
-  handler                = "index.lambda_handler"
+  handler                = "index.lambdaHandler"
   runtime                = "provided.al2023"
   ephemeral_storage_size = 10240
   architectures          = ["arm64"]
@@ -19,7 +19,7 @@ module "ffnotifier_lambda_function" {
   trusted_entities       = ["scheduler.amazonaws.com"]
   local_existing_package = "${path.module}/ffnotifier/ffnotifier.zip"
 
-  source_path = "${path.module}/../ffnotifier"
+  source_path = "${path.module}/ffnotifier"
 
   #   store_on_s3 = true
   #   s3_bucket   = module.s3_bucket.s3_bucket_id
@@ -51,8 +51,8 @@ module "ffnotifier_lambda_function" {
   role_path   = "/tf-managed/"
   policy_path = "/tf-managed/"
 
-  attach_dead_letter_policy = true
-  dead_letter_target_arn    = aws_sqs_queue.dlq.arn
+#   attach_dead_letter_policy = true
+#   dead_letter_target_arn    = aws_sqs_queue.dlq.arn
 
   allowed_triggers = {
     Config = {
@@ -180,40 +180,10 @@ module "ffnotifier_lambda_function" {
   }
 
   function_tags = {
-    Language = "python"
+    Language = "Go"
   }
 
   tags = {
     Module = "lambda1"
   }
-}
-
-##################
-# Extra resources
-##################
-
-resource "random_pet" "this" {
-  length = 2
-}
-
-module "s3_bucket" {
-  source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "~> 3.0"
-
-  bucket_prefix = "${random_pet.this.id}-"
-  force_destroy = true
-
-  # S3 bucket-level Public Access Block configuration
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-
-  versioning = {
-    enabled = true
-  }
-}
-
-resource "aws_sqs_queue" "dlq" {
-  name = random_pet.this.id
 }

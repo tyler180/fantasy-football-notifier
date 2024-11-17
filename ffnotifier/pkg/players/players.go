@@ -17,7 +17,7 @@ func freeAgents(ctx context.Context, league_id, position string) error {
 		return fmt.Errorf("Error getting cookie: %v", err)
 	}
 
-	url := fmt.Sprintf("%s://%s/%s/export", proto, apiHost, year)
+	url := fmt.Sprintf("%s://%s/%s/export", main.proto, apiHost, year)
 	headers := http.Header{}
 	headers.Add("Cookie", fmt.Sprintf("MFL_USER_ID=%s", cookie))
 	args := fmt.Sprintf("TYPE=freeAgents&L=%s&W=&JSON=%d", league_id, json)

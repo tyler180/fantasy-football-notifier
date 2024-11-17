@@ -29,11 +29,11 @@ module "eventbridge_scheduler" {
       arn                 = module.ffnotifier_lambda_function.lambda_function_arn
       input               = jsonencode({ "job" : "cron-by-rate" })
     }
-    prod-lambda-cron = {
-      group_name          = "prod"
-      schedule_expression = "rate(10 hours)"
-      arn                 = module.ffnotifier_lambda_function.lambda_function_arn
-    }
+    # prod-lambda-cron = {
+    #   group_name          = "prod"
+    #   schedule_expression = "rate(10 hours)"
+    #   arn                 = module.ffnotifier_lambda_function.lambda_function_arn
+    # }
     # kinesis-cron = {
     #   group_name          = "prod"
     #   schedule_expression = "rate(10 hours)"

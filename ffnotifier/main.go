@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"context"
@@ -18,11 +18,11 @@ const (
 	year     = "2024"
 	proto    = "https"
 	apiHost  = "api.myfantasyleague.com"
-	json     = 0
+	json     = 1
 	reqType  = "league"
 )
 
-func handler(ctx context.Context) {
+func lambdaHandler(ctx context.Context) {
 	client := &http.Client{}
 
 	cookie, err := cmd.GetCookie(client)
@@ -36,8 +36,9 @@ func handler(ctx context.Context) {
 	headers := http.Header{}
 	headers.Add("Cookie", fmt.Sprintf("MFL_USER_ID=%s", cookie))
 	mlArgs := fmt.Sprintf("TYPE=myleagues&JSON=%d", json)
+	fmt.Printf("The value of mlArgs is: %s\n", mlArgs)
 	mlURL := fmt.Sprintf("%s?%s", url, mlArgs)
-	fmt.Printf("Making request to get league host: %s\n", mlURL)
+	fmt.Printf("Making request to get league host (value of mlURL): %s\n", mlURL)
 
 	req, err := http.NewRequest("GET", mlURL, nil)
 	if err != nil {
@@ -99,5 +100,5 @@ func handler(ctx context.Context) {
 // }
 
 func main() {
-	lambda.Start(handler)
+	lambda.Start(lambdaHandler)
 }
