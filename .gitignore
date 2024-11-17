@@ -36,6 +36,8 @@ inc/
 
 # Terraform
 .terraform
+*.tfstate
+*.tfstate.*
 
 # Go
 .env
