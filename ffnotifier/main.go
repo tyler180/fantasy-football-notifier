@@ -9,6 +9,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/tyler180/fantasy-football-notifier/ffnotifier/cmd"
+	"github.com/tyler180/fantasy-football-notifier/ffnotifier/pkg/league"
 )
 
 const (
@@ -31,6 +32,13 @@ func lambdaHandler(ctx context.Context) {
 		return
 	}
 	fmt.Printf("Got cookie %s\n", cookie)
+
+	league_ids, err := league.GetLeagueIDs(cookie)
+	if err != nil {
+		fmt.Printf("Error getting league IDs: %v\n", err)
+		return
+	}
+	fmt.Printf("Got league IDs: %v\n", league_ids)
 
 	url := fmt.Sprintf("%s://%s/%s/export", proto, apiHost, year)
 	headers := http.Header{}

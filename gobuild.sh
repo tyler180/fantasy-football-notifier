@@ -17,7 +17,7 @@ fi
 mv $BINARY_NAME $BINARY_NAME.old 2>/dev/null
 
 # Build the Go binary
-GOOS=linux GOARCH=amd64 go build -o $BINARY_NAME main.go
+GOOS=linux GOARCH=arm64 go build -o $BINARY_NAME main.go
 
 # Check if the build was successful
 if [ $? -ne 0 ]; then
