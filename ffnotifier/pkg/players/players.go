@@ -52,7 +52,7 @@ func FreeAgents(cookie, league_id, position string) error {
 	leagueHostRegex := regexp.MustCompile(`url="(https?)://([a-z0-9]+.myfantasyleague.com)/` + year + `/home/` + leagueID + `"`)
 	leagueMatches := leagueHostRegex.FindStringSubmatch(string(mlBody))
 	if len(leagueMatches) < 3 {
-		fmt.Printf("Cannot find league host in response: %s\n", string(mlBody))
+		fmt.Printf("In the players package. Cannot find league host in response: %s\n", string(mlBody))
 		return nil
 	}
 	protocol := leagueMatches[1]

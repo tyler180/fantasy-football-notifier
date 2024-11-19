@@ -39,8 +39,8 @@ module "ffnotifier_lambda_function" {
   #   ]
 
   environment_variables = {
-    USERNAME   = ""
-    PASSWORD   = ""
+    USERNAME   = "PLACEHOLDER"
+    PASSWORD   = "PLACEHOLDER"
     YEAR       = "2024"
     LEAGUE_ID  = "79286"
     FRANCHISE_ID = "0005"

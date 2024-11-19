@@ -1,0 +1,20 @@
+{
+    "encoding": "utf-8",
+    "leagues": {
+        "league": [
+            {
+                "url": "https://www45.myfantasyleague.com/2024/home/50360",
+                "league_id": "50360",
+                "franchise_id": "0012",
+                "name": "Archipelago"
+            },
+            {
+                "franchise_id": "0005",
+                "name": "I Paid What For Who?",
+                "url": "https://www49.myfantasyleague.com/2024/home/79286",
+                "league_id": "79286"
+            }
+        ]
+    },
+    "version": "1.0"
+}

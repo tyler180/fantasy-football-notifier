@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"regexp"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/tyler180/fantasy-football-notifier/ffnotifier/cmd"
@@ -13,32 +15,52 @@ import (
 )
 
 const (
-	leagueID = "LEAGUE_ID"
-	username = "USERNAME"
-	password = "PASSWORD"
-	year     = "2024"
-	proto    = "https"
-	apiHost  = "api.myfantasyleague.com"
-	json     = 1
-	reqType  = "league"
+	// leagueID = "LEAGUE_ID"
+	// username = "USERNAME"
+	// password = "PASSWORD"
+	year    = "2024"
+	proto   = "https"
+	apiHost = "api.myfantasyleague.com"
+	json    = 1
+	reqType = "league"
 )
+
+var username string
+var password string
 
 func lambdaHandler(ctx context.Context) {
 	client := &http.Client{}
 
-	cookie, err := cmd.GetCookie(client)
+	username := os.Getenv("USERNAME")
+	password := os.Getenv("PASSWORD")
+
+	cookie, err := cmd.GetCookie(client, username, password)
 	if err != nil {
 		fmt.Printf("Error getting cookie: %v\n", err)
 		return
 	}
 	fmt.Printf("Got cookie %s\n", cookie)
 
-	league_ids, err := league.GetLeagueIDs(cookie)
+	leagues, err := league.GetLeagueInfo(cookie)
 	if err != nil {
 		fmt.Printf("Error getting league IDs: %v\n", err)
 		return
 	}
-	fmt.Printf("Got league IDs: %v\n", league_ids)
+
+	var leagueID string
+	for _, l := range leagues {
+		fmt.Printf("League ID: %s, Name: %s, Franchise ID: %s, URL: %s\n", l.LeagueID, l.Name, l.FranchiseID, l.URL)
+		if strings.HasPrefix(l.Name, "I Paid What") {
+			leagueID = l.LeagueID
+		}
+	}
+
+	if leagueID == "" {
+		fmt.Println("No league found with name starting with 'I Paid What'")
+		return
+	}
+
+	fmt.Printf("Selected League ID: %s\n", leagueID)
 
 	url := fmt.Sprintf("%s://%s/%s/export", proto, apiHost, year)
 	headers := http.Header{}
@@ -70,14 +92,16 @@ func lambdaHandler(ctx context.Context) {
 
 	leagueHostRegex := regexp.MustCompile(`url="(https?)://([a-z0-9]+.myfantasyleague.com)/` + year + `/home/` + leagueID + `"`)
 	leagueMatches := leagueHostRegex.FindStringSubmatch(string(mlBody))
-	if len(leagueMatches) < 3 {
-		fmt.Printf("Cannot find league host in response: %s\n", string(mlBody))
+	if len(leagueMatches) < 1 {
+		fmt.Println("No league host found in response")
+		fmt.Printf("In the main package. Cannot find league host in response: %s\n", string(mlBody))
 		return
 	}
 	protocol := leagueMatches[1]
 	leagueHost := leagueMatches[2]
 	fmt.Printf("Got league host %s\n", leagueHost)
 	url = fmt.Sprintf("%s://%s/%s/export", protocol, leagueHost, year)
+	fmt.Println("The value of url is:")
 	fmt.Println(url)
 
 	// Ensure the program ends cleanly

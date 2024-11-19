@@ -1,32 +1,44 @@
 package league
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"regexp"
 )
+
+// var leagueIDRegex = regexp.MustCompile(`"id":"(\d+)"`)
 
 const (
 	leagueID = "LEAGUE_ID"
 	year     = "2024"
 	proto    = "https"
 	apiHost  = "api.myfantasyleague.com"
-	json     = 1
+	// json     = 1
 )
 
-func GetLeagueIDs(cookie string) ([][]string, error) {
-	client := &http.Client{}
+type Leagues struct {
+	Leagues LeagueContainer `json:"leagues"`
+}
 
-	// cookie, err := cmd.GetCookie(client)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("error getting cookie: %v", err)
-	// }
+type LeagueContainer struct {
+	League []League `json:"league"`
+}
+
+type League struct {
+	LeagueID    string `json:"league_id"`
+	Name        string `json:"name"`
+	FranchiseID string `json:"franchise_id"`
+	URL         string `json:"url"`
+}
+
+func GetLeagueInfo(cookie string) ([]League, error) {
+	client := &http.Client{}
 
 	url := fmt.Sprintf("%s://%s/%s/export", proto, apiHost, year)
 	headers := http.Header{}
 	headers.Add("Cookie", fmt.Sprintf("MFL_USER_ID=%s", cookie))
-	args := fmt.Sprintf("TYPE=myleagues&YEAR=%s&JSON=%d", year, json)
+	args := fmt.Sprintf("TYPE=myleagues&YEAR=%s&JSON=1", year)
 	mlURL := fmt.Sprintf("%s?%s", url, args)
 
 	req, err := http.NewRequest("GET", mlURL, nil)
@@ -46,20 +58,11 @@ func GetLeagueIDs(cookie string) ([][]string, error) {
 		return nil, fmt.Errorf("error reading league response: %v", err)
 	}
 
-	leagueIDRegex := regexp.MustCompile(`"league_id":\s*"(\d+)"`)
-	matches := leagueIDRegex.FindAllStringSubmatch(string(mlBody), -1)
-	if matches == nil {
-		fmt.Printf("No league_id found in response: %s\n", string(mlBody))
-		return nil, nil
+	var leaguesResp Leagues
+	err = json.Unmarshal(mlBody, &leaguesResp)
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshalling league response: %v", err)
 	}
 
-	for _, match := range matches {
-		if len(match) > 1 {
-			fmt.Printf("Found league_id: %s\n", match[1])
-			return matches, nil
-		}
-	}
-
-	fmt.Println("Program completed successfully.")
-	return nil, nil
+	return leaguesResp.Leagues.League, nil
 }

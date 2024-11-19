@@ -8,17 +8,17 @@ import (
 )
 
 const (
-	leagueID = "LEAGUE_ID"
-	username = "USERNAME"
-	password = "PASSWORD"
-	year     = "2024"
-	proto    = "https"
-	apiHost  = "api.myfantasyleague.com"
-	json     = 0
-	reqType  = "league"
+	// leagueID = "LEAGUE_ID"
+	// username = "USERNAME"
+	// password = "PASSWORD"
+	year    = "2024"
+	proto   = "https"
+	apiHost = "api.myfantasyleague.com"
+	json    = 0
+	reqType = "league"
 )
 
-func GetCookie(client *http.Client) (string, error) {
+func GetCookie(client *http.Client, username, password string) (string, error) {
 	loginURL := fmt.Sprintf("https://%s/%s/login?USERNAME=%s&PASSWORD=%s&XML=1", apiHost, year, username, password)
 	fmt.Printf("Making request to get cookie: %s\n", loginURL)
 	loginResp, err := client.Get(loginURL)
